@@ -14,6 +14,8 @@ using Course.Services.Catalog.Services;
 using Course.Services.Catalog.Services.Abstract;
 using Course.Services.Catalog.Services.Concrete;
 using Course.Services.Catalog.Settings;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.Extensions.Options;
 
 namespace Course.Services.Catalog
@@ -30,12 +32,23 @@ namespace Course.Services.Catalog
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(options =>
+                {
+                    //kimin dağıtıcı olduğunu belirtir
+                    options.Authority = Configuration["IdentityServerUrl"];
+                    options.Audience = "resource_catalog";
+                    options.RequireHttpsMetadata = false;
+                });
             services.AddScoped<ICategoryService, CategoryService>();
             services.AddScoped<ICourseService, CourseService>();
             services.AddAutoMapper(typeof(Startup));
-            services.AddControllers();
+            services.AddControllers(options=>
+            {
+                options.Filters.Add(new AuthorizeFilter());
+            });
             services.Configure<DatabaseSettings>(Configuration.GetSection("DatabaseSettings"));
-            services.AddSingleton<IDatabaseSettings>(sp=> sp.GetRequiredService<IOptions<DatabaseSettings>>().Value);
+            services.AddSingleton<IDatabaseSettings>(sp => sp.GetRequiredService<IOptions<DatabaseSettings>>().Value);
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Course.Services.Catalog", Version = "v1" });
@@ -53,7 +66,7 @@ namespace Course.Services.Catalog
             }
 
             app.UseRouting();
-
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
