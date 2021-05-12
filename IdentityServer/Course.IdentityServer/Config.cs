@@ -16,7 +16,8 @@ namespace Course.IdentityServer
         public static IEnumerable<ApiResource> ApiResources => new ApiResource[]
         {
             new ApiResource("resource_catalog"){Scopes = {"catolog_fullpermission"}},
-            new ApiResource("photo_stock_catalog"){Scopes = {"photo_stock_fullpermission"}},
+            new ApiResource("resource_photo_stock"){Scopes = {"photo_stock_fullpermission"}},
+            new ApiResource("resource_basket"){Scopes = {"basket_fullpermission"}},
             new ApiResource(IdentityServerConstants.LocalApi.ScopeName)
         };
 
@@ -36,6 +37,7 @@ namespace Course.IdentityServer
             {
                 new ApiScope("catolog_fullpermission","Catalog API için full erişim"),
                 new ApiScope("photo_stock_fullpermission","Photo Stock API için full erişim"),
+                new ApiScope("basket_fullpermission","Basket API için full erişim"),
                 new ApiScope(IdentityServerConstants.LocalApi.ScopeName)
             };
 
@@ -60,7 +62,7 @@ namespace Course.IdentityServer
                     AllowedGrantTypes = { GrantType.ResourceOwnerPassword },
                     // OpenId mutlaka olmalı - Scopelar servislerin token ile erişebileceği bilgileri tutar
                     // IdentityServer'a istek yapabilmek için "IdentityServerConstants.LocalApi.ScopeName" ekli olmalı
-                    AllowedScopes = { IdentityServerConstants.LocalApi.ScopeName, IdentityServerConstants.StandardScopes.Email, IdentityServerConstants.StandardScopes.OpenId,
+                    AllowedScopes = { "basket_fullpermission", IdentityServerConstants.LocalApi.ScopeName, IdentityServerConstants.StandardScopes.Email, IdentityServerConstants.StandardScopes.OpenId,
                         IdentityServerConstants.StandardScopes.Profile, IdentityServerConstants.StandardScopes.OfflineAccess, "roles"  },
                     AccessTokenLifetime = 1*60*60,
                     RefreshTokenExpiration = TokenExpiration.Absolute,
