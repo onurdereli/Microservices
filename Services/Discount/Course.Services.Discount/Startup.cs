@@ -1,15 +1,17 @@
+using System.IdentityModel.Tokens.Jwt;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using Course.Services.Discount.Services.Abstract;
+using Course.Services.Discount.Services.Concrete;
+using Course.Shared.Services.Abstract;
+using Course.Shared.Services.Concrete;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc.Authorization;
 
 namespace Course.Services.Discount
 {
@@ -25,8 +27,25 @@ namespace Course.Services.Discount
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            // giriş yapmış bir kullanıcı beklediğini belirtir
+            var requireAutorizePolicy = new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build();
+            JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Remove("sub");
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(options =>
+                {
+                    //kimin dağıtıcı olduğunu belirtir
+                    options.Authority = Configuration["IdentityServerUrl"];
+                    options.Audience = "resource_discount";
+                    options.RequireHttpsMetadata = false;
+                });
+            services.AddHttpContextAccessor();
 
-            services.AddControllers();
+            services.AddScoped<IDiscountService, DiscountService>();
+            services.AddScoped<ISharedIdentityService, SharedIdentityService>();
+            services.AddControllers(options=>
+            {
+                options.Filters.Add(new AuthorizeFilter(requireAutorizePolicy));
+            });
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Course.Services.Discount", Version = "v1" });
@@ -44,7 +63,7 @@ namespace Course.Services.Discount
             }
 
             app.UseRouting();
-
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
