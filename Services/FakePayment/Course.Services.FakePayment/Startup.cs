@@ -37,7 +37,7 @@ namespace Course.Services.FakePayment
                 {
                     //kimin dağıtıcı olduğunu belirtir
                     options.Authority = Configuration["IdentityServerUrl"];
-                    options.Audience = "resource_discount";
+                    options.Audience = "resource_payment";
                     options.RequireHttpsMetadata = false;
                 });
             services.AddHttpContextAccessor();
