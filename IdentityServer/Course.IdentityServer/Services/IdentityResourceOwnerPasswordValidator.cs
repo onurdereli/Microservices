@@ -25,13 +25,25 @@ namespace Course.IdentityServer.Services
 
             if (existUser == null)
             {
+                var errors = new Dictionary<string, object>
+                {
+                    {"errors", new List<string> {"Email veya şifreniz yanlış"}}
+                };
+                context.Result.CustomResponse = errors;
+
                 return;
             }
 
             var passwordCheck = await _userManager.CheckPasswordAsync(existUser, context.Password);
 
-            if (!passwordCheck)
+            if (passwordCheck == false)
             {
+                var errors = new Dictionary<string, object>
+                {
+                    {"errors", new List<string> {"Email veya şifreniz yanlış"}}
+                };
+                context.Result.CustomResponse = errors;
+
                 return;
             }
 
