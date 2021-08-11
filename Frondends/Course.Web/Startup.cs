@@ -10,6 +10,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Course.Shared.Services.Abstract;
 using Course.Shared.Services.Concrete;
+using Course.Web.Handler;
 using Course.Web.Models;
 using Course.Web.Services.Abstract;
 using Course.Web.Services.Concrete;
@@ -34,9 +35,23 @@ namespace Course.Web
             services.Configure<ServiceApiSettings>(Configuration.GetSection("ServiceApiSettings"));
             services.AddHttpContextAccessor();
             services.AddHttpClient<IIdentityService, IdentityService>();
+            services.AddScoped<ResourceOwnerPasswordTokenHandler>();
+
+            var serviceApiSettings = Configuration.GetSection("ServiceApiSettings").Get<ServiceApiSettings>();
+
+            services.AddHttpClient<ICatalogService, CatalogService>(options =>
+            {
+                options.BaseAddress = new Uri($"{serviceApiSettings.GatewayBaseUri}/{serviceApiSettings.Catalog.Path}");
+            });
+
+            services.AddHttpClient<IUserService, UserService>(options =>
+            {
+                options.BaseAddress = new Uri(serviceApiSettings.IdentityBaseUri);
+            }).AddHttpMessageHandler<ResourceOwnerPasswordTokenHandler>();
+
             services.AddScoped<ISharedIdentityService, SharedIdentityService>();
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-                .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options=>
+                .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
                 {
                     options.LoginPath = "/Auth/SignIn";
                     options.ExpireTimeSpan = TimeSpan.FromDays(60);
@@ -45,7 +60,7 @@ namespace Course.Web
                     options.Cookie.Name = "coursecookie";
 
                 });
-            
+
             services.AddControllersWithViews();
         }
 

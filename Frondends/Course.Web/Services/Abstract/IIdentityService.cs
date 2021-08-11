@@ -11,6 +11,6 @@ namespace Course.Web.Services.Abstract
 
         Task<TokenResponse> GetAccessTokenByRefleshToken();
 
-        Task RemoveRefleshToken();
+        Task RevokeRefleshToken();
     }
 }

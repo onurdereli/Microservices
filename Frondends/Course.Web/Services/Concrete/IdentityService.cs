@@ -26,6 +26,8 @@ namespace Course.Web.Services.Concrete
         private readonly ServiceApiSettings _serviceApiSettings;
         private readonly ClientSettings _clientSettings;
 
+        // https://identitymodel.readthedocs.io/en/latest/
+
         public IdentityService(HttpClient httpClient, IHttpContextAccessor httpContextAccessor, IOptions<ClientSettings> clientSettings, IOptions<ServiceApiSettings> serviceApiSettings)
         {
             _httpClient = httpClient;
@@ -36,15 +38,15 @@ namespace Course.Web.Services.Concrete
 
         public async Task<Response<bool>> SignIn(SignInInput signinInput)
         {
-            var disco = await _httpClient.GetDiscoveryDocumentAsync(new DiscoveryDocumentRequest
+            var discovery = await _httpClient.GetDiscoveryDocumentAsync(new DiscoveryDocumentRequest
             {
-                Address = _serviceApiSettings.BaseUri,
+                Address = _serviceApiSettings.IdentityBaseUri,
                 Policy = new DiscoveryPolicy { RequireHttps = false }
             });
 
-            if (disco.IsError)
+            if (discovery.IsError)
             {
-                throw disco.Exception;
+                throw discovery.Exception;
             }
 
             var passwordTokenRequest = new PasswordTokenRequest
@@ -53,7 +55,7 @@ namespace Course.Web.Services.Concrete
                 ClientSecret = _clientSettings.WebClientForUser.ClientSecret,
                 UserName = signinInput.Email,
                 Password = signinInput.Password,
-                Address = disco.TokenEndpoint
+                Address = discovery.TokenEndpoint
             };
 
             var token = await _httpClient.RequestPasswordTokenAsync(passwordTokenRequest);
@@ -70,7 +72,7 @@ namespace Course.Web.Services.Concrete
             var userInfoRequest = new UserInfoRequest
             {
                 Token = token.AccessToken,
-                Address = disco.UserInfoEndpoint
+                Address = discovery.UserInfoEndpoint
             };
 
             var userInfo = await _httpClient.GetUserInfoAsync(userInfoRequest);
@@ -100,14 +102,80 @@ namespace Course.Web.Services.Concrete
             return Response<bool>.Success(200);
         }
 
-        public Task<TokenResponse> GetAccessTokenByRefleshToken()
+        public async Task<TokenResponse> GetAccessTokenByRefleshToken()
         {
-            throw new NotImplementedException();
+            var discovery = await _httpClient.GetDiscoveryDocumentAsync(new DiscoveryDocumentRequest
+            {
+                Address = _serviceApiSettings.IdentityBaseUri,
+                Policy = new DiscoveryPolicy { RequireHttps = false }
+            });
+
+            if (discovery.IsError)
+            {
+                throw discovery.Exception;
+            }
+
+            var refleshToken = await _httpContextAccessor.HttpContext.GetTokenAsync(OpenIdConnectParameterNames.RefreshToken);
+
+            RefreshTokenRequest refreshTokenRequest = new()
+            {
+                Address = discovery.TokenEndpoint,
+                ClientId = _clientSettings.WebClientForUser.ClientId,
+                ClientSecret = _clientSettings.WebClientForUser.ClientSecret,
+                RefreshToken = refleshToken
+            };
+
+            var token = await _httpClient.RequestRefreshTokenAsync(refreshTokenRequest);
+
+            if (token.IsError)
+            {
+                throw token.Exception;
+            }
+
+            var authenticationTokens = new List<AuthenticationToken>()
+            {
+                new AuthenticationToken{ Name=OpenIdConnectParameterNames.AccessToken,Value=token.AccessToken},
+                new AuthenticationToken{ Name=OpenIdConnectParameterNames.RefreshToken,Value=token.RefreshToken},
+                new AuthenticationToken{ Name=OpenIdConnectParameterNames.ExpiresIn,Value= DateTime.Now.AddSeconds(token.ExpiresIn).ToString("o",CultureInfo.InvariantCulture)}
+            };
+            ;
+
+            var authenticateResult = await _httpContextAccessor.HttpContext.AuthenticateAsync();
+
+            var properties = authenticateResult.Properties;
+
+            properties.StoreTokens(authenticationTokens);
+
+            await _httpContextAccessor.HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, authenticateResult.Principal, properties);
+
+            return token;
         }
 
-        public Task RemoveRefleshToken()
+        public async Task RevokeRefleshToken()
         {
-            throw new NotImplementedException();
+            var discovery = await _httpClient.GetDiscoveryDocumentAsync(new DiscoveryDocumentRequest
+            {
+                Address = _serviceApiSettings.IdentityBaseUri,
+                Policy = new DiscoveryPolicy { RequireHttps = false }
+            });
+
+            if (discovery.IsError)
+            {
+                throw discovery.Exception;
+            }
+
+            var refleshToken = await _httpContextAccessor.HttpContext.GetTokenAsync(OpenIdConnectParameterNames.RefreshToken);
+
+            TokenRevocationRequest tokenRevocationRequest = new()
+            {
+                ClientId = _clientSettings.WebClientForUser.ClientId,
+                ClientSecret = _clientSettings.WebClientForUser.ClientSecret,
+                Address = discovery.RevocationEndpoint,
+                Token = refleshToken,
+                TokenTypeHint = OpenIdConnectParameterNames.RefreshToken
+            };
+
+            await _httpClient.RevokeTokenAsync(tokenRevocationRequest);
         }
     }
 }
