@@ -19,7 +19,7 @@ namespace Course.Web.Services.Concrete
         
         public async Task<List<CourseViewModel>> GetAllCourse()
         {
-            var response = await _httpClient.GetAsync("courses");
+            var response = await _httpClient.GetAsync("course");
 
             if (!response.IsSuccessStatusCode)
             {
@@ -33,7 +33,7 @@ namespace Course.Web.Services.Concrete
 
         public async Task<List<CategoryViewModel>> GetAllGategory()
         {
-            var response = await _httpClient.GetAsync("categories");
+            var response = await _httpClient.GetAsync("category");
 
             if (!response.IsSuccessStatusCode)
             {
@@ -63,7 +63,7 @@ namespace Course.Web.Services.Concrete
         public async Task<CourseViewModel> GetByCourseId(string courseId)
         {
             //{id}
-            var response = await _httpClient.GetAsync(courseId);
+            var response = await _httpClient.GetAsync($"course/{courseId}");
 
             if (!response.IsSuccessStatusCode)
             {
@@ -77,21 +77,21 @@ namespace Course.Web.Services.Concrete
 
         public async Task<bool> CreateCourse(CourseCreateInput courseCreateInput)
         {
-            var response = await _httpClient.PostAsJsonAsync<CourseCreateInput>("courses", courseCreateInput);
+            var response = await _httpClient.PostAsJsonAsync<CourseCreateInput>("course", courseCreateInput);
 
             return response.IsSuccessStatusCode;
         }
 
         public async Task<bool> UpdateCourse(CourseUpdateInput courseUpdateInput)
         {
-            var response = await _httpClient.PutAsJsonAsync<CourseUpdateInput>("courses", courseUpdateInput);
+            var response = await _httpClient.PutAsJsonAsync<CourseUpdateInput>("course", courseUpdateInput);
 
             return response.IsSuccessStatusCode;
         }
 
         public async Task<bool> DeleteCourse(string courseId)
         {
-            var response = await _httpClient.DeleteAsync($"courses/{courseId}");
+            var response = await _httpClient.DeleteAsync($"course/{courseId}");
 
             return response.IsSuccessStatusCode;
         }

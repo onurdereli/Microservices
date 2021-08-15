@@ -8,12 +8,12 @@ namespace Course.Shared.Dtos
         public T Data { get; set; }
 
         [JsonIgnore]
-        public int StatusCode { get; private set; }
+        public int StatusCode { get; set; }
 
         [JsonIgnore]
-        public bool IsSuccessfull { get; private set; }
+        public bool IsSuccessfull { get; set; }
 
-        public List<string> Errors { get; private set; }
+        public List<string> Errors { get; set; }
 
         //Static Factory Methods
         public static Response<T> Success(T data, int statusCode) => new Response<T> { Data = data, StatusCode = statusCode, IsSuccessfull = true };
