@@ -1,9 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Course.Services.PhotoStock.Dtos;
@@ -20,19 +17,19 @@ namespace Course.Services.PhotoStock.Controllers
         [HttpPost]
         public async Task<IActionResult> PhotoSave(IFormFile photoFile, CancellationToken cancellationToken)
         {
-            if (photoFile == null || photoFile.Length <= 0)
+            if (photoFile is not { Length: > 0 })
             {
                 return CreateActionResultInstance(Response<PhotoDto>.Fail("Photo is empty", 400));
-            }   
+            }
 
             var path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/photos", photoFile.FileName);
 
             await using var steam = new FileStream(path, FileMode.Create);
             await photoFile.CopyToAsync(steam, cancellationToken);
 
-            var returnPath = "photos/" + photoFile.FileName;
+            var returnPath = photoFile.FileName;
 
-            PhotoDto photoDto = new() { Url = returnPath};
+            PhotoDto photoDto = new() { Url = returnPath };
 
             return CreateActionResultInstance(Response<PhotoDto>.Success(photoDto, 200));
         }

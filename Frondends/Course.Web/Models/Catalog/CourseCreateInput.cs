@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 
 namespace Course.Web.Models.Catalog
 {
@@ -29,5 +30,8 @@ namespace Course.Web.Models.Catalog
         [Display(Name = "Kurs kategorisi")]
         [Required]
         public string CategoryId { get; set; }
+
+        [Display(Name = "Kurs Resmi")]
+        public IFormFile PhotoFormFile { get; set; }
     }
 }

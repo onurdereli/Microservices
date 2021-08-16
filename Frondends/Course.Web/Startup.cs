@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using Course.Shared.Services.Abstract;
 using Course.Shared.Services.Concrete;
 using Course.Web.Handler;
+using Course.Web.Helpers;
 using Course.Web.Models;
 using Course.Web.Services.Abstract;
 using Course.Web.Services.Concrete;
@@ -39,6 +40,7 @@ namespace Course.Web
             services.AddScoped<ClientCredentialTokenHandler>();
             services.AddScoped<ISharedIdentityService, SharedIdentityService>();
             services.AddScoped<ISharedIdentityService, SharedIdentityService>();
+            services.AddSingleton<PhotoHelper>();
 
             var serviceApiSettings = Configuration.GetSection("ServiceApiSettings").Get<ServiceApiSettings>();
 
@@ -50,6 +52,11 @@ namespace Course.Web
             services.AddHttpClient<ICatalogService, CatalogService>(options =>
             {
                 options.BaseAddress = new Uri($"{serviceApiSettings.GatewayBaseUri}/{serviceApiSettings.Catalog.Path}");
+            }).AddHttpMessageHandler<ClientCredentialTokenHandler>();
+
+            services.AddHttpClient<IPhotoStockService, PhotoStockService>(options =>
+            {
+                options.BaseAddress = new Uri($"{serviceApiSettings.GatewayBaseUri}/{serviceApiSettings.PhotoStock.Path}");
             }).AddHttpMessageHandler<ClientCredentialTokenHandler>();
 
             services.AddHttpClient<IClientCredentialTokenService, ClientCredentialTokenService>();

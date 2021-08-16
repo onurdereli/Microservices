@@ -11,9 +11,9 @@
 
             <form asp-controller="Course" asp-action="Update" method="post" enctype="multipart/form-data">
                 <div asp-validation-summary="ModelOnly"></div>
-                <input type="hidden" asp-for="Picture"/>
-                <input type="hidden" asp-for="Id"/>
-                <input type="hidden" asp-for="UserId"/>
+                <input type="hidden" asp-for="Picture" />
+                <input type="hidden" asp-for="Id" />
+                <input type="hidden" asp-for="UserId" />
                 <div class="mb-3">
                     <label asp-for="CategoryId" class="form-label"></label>
                     <select asp-for="CategoryId" class="form-control" asp-items="ViewBag.categoryList">
@@ -40,7 +40,10 @@
                     <input asp-for="Feature.Duration" class="form-control" />
                     <span class="text-danger" asp-validation-for="Feature.Duration"></span>
                 </div>
-                @*resim input gelecek*@
+                <div class="mb-3">
+                    <label asp-for="PhotoFormFile" class="form-label"></label>
+                    <input asp-for="PhotoFormFile" type="file" class="form-control" />
+                </div>
                 <button type="submit" class="btn btn-primary">Kursu Güncelle</button>
             </form>
         </div>

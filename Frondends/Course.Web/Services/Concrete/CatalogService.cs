@@ -1,8 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Json;
+using System.Reflection.PortableExecutable;
 using System.Threading.Tasks;
 using Course.Shared.Dtos;
+using Course.Web.Helpers;
 using Course.Web.Models.Catalog;
 using Course.Web.Services.Abstract;
 
@@ -12,9 +14,15 @@ namespace Course.Web.Services.Concrete
     {
         private readonly HttpClient _httpClient;
 
-        public CatalogService(HttpClient httpClient)
+        private readonly IPhotoStockService _photoStockService;
+
+        private readonly PhotoHelper _photoHelper;
+
+        public CatalogService(HttpClient httpClient, IPhotoStockService photoStockService, PhotoHelper photoHelper)
         {
             _httpClient = httpClient;
+            _photoStockService = photoStockService;
+            _photoHelper = photoHelper;
         }
         
         public async Task<List<CourseViewModel>> GetAllCourse()
@@ -27,6 +35,11 @@ namespace Course.Web.Services.Concrete
             }
 
             var responseSuccess = await response.Content.ReadFromJsonAsync<Response<List<CourseViewModel>>>();
+
+            responseSuccess?.Data.ForEach(course=>
+            {
+                course.Picture = _photoHelper.GetPhotoStockUrl(course.Picture);
+            });
 
             return responseSuccess?.Data;
         }
@@ -57,6 +70,11 @@ namespace Course.Web.Services.Concrete
 
             var responseSuccess = await response.Content.ReadFromJsonAsync<Response<List<CourseViewModel>>>();
 
+            responseSuccess?.Data.ForEach(course =>
+            {
+                course.Picture = _photoHelper.GetPhotoStockUrl(course.Picture);
+            });
+
             return responseSuccess?.Data;
         }
 
@@ -77,6 +95,13 @@ namespace Course.Web.Services.Concrete
 
         public async Task<bool> CreateCourse(CourseCreateInput courseCreateInput)
         {
+            var resultPhoto = await _photoStockService.UploadPhoto(courseCreateInput.PhotoFormFile);
+
+            if(resultPhoto != null)
+            {
+                courseCreateInput.Picture = resultPhoto.Url;
+            }
+
             var response = await _httpClient.PostAsJsonAsync<CourseCreateInput>("course", courseCreateInput);
 
             return response.IsSuccessStatusCode;
@@ -84,6 +109,15 @@ namespace Course.Web.Services.Concrete
 
         public async Task<bool> UpdateCourse(CourseUpdateInput courseUpdateInput)
         {
+            var resultPhoto = await _photoStockService.UploadPhoto(courseUpdateInput.PhotoFormFile);
+
+            if (resultPhoto != null)
+            {
+                await _photoStockService.DeletePhoto(courseUpdateInput.Picture);
+
+                courseUpdateInput.Picture = resultPhoto.Url;
+            }
+
             var response = await _httpClient.PutAsJsonAsync<CourseUpdateInput>("course", courseUpdateInput);
 
             return response.IsSuccessStatusCode;
