@@ -12,6 +12,7 @@
             <img src="@Model.StockPictureUrl" class="card-img-top" />
             <div class="card-body">
                 <h5 class="card-title">@Model.Name</h5>
+                <p class="badge bg-primary">@Model.Category.Name</p>
                 <p class="card-text">@Model.Description</p>
             </div>
         </div>
@@ -22,7 +23,9 @@
                 <h4 class="card-title">
                     Fiyat: @Model.Price TL
                 </h4>
-                <a class="btn btn-primary btn-block" href="#">Sepete ekle</a>
+                <div class="d-grid">
+                    <a asp-controller="Basket" asp-action="AddBasketItem" asp-route-courseId="@Model.Id" class="btn btn-primary">Sepete ekle</a>
+                </div>
             </div>
         </div>
     </div>

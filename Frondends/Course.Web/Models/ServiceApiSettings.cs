@@ -16,6 +16,8 @@ namespace Course.Web.Models
         public ServiceApi Catalog { get; set; }
 
         public ServiceApi PhotoStock { get; set; }
+
+        public ServiceApi Basket { get; set; }
     }
 
     public class ServiceApi
