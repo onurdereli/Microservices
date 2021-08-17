@@ -38,7 +38,7 @@ namespace Course.Web.Services.Concrete
 
             responseSuccess?.Data.ForEach(course=>
             {
-                course.Picture = _photoHelper.GetPhotoStockUrl(course.Picture);
+                course.StockPictureUrl = _photoHelper.GetPhotoStockUrl(course.Picture);
             });
 
             return responseSuccess?.Data;
@@ -72,7 +72,7 @@ namespace Course.Web.Services.Concrete
 
             responseSuccess?.Data.ForEach(course =>
             {
-                course.Picture = _photoHelper.GetPhotoStockUrl(course.Picture);
+                course.StockPictureUrl = _photoHelper.GetPhotoStockUrl(course.Picture);
             });
 
             return responseSuccess?.Data;
@@ -89,8 +89,8 @@ namespace Course.Web.Services.Concrete
             }
 
             var responseSuccess = await response.Content.ReadFromJsonAsync<Response<CourseViewModel>>();
-
-            return responseSuccess?.Data;
+            responseSuccess.Data.StockPictureUrl = _photoHelper.GetPhotoStockUrl(responseSuccess.Data.Picture);
+            return responseSuccess.Data;
         }
 
         public async Task<bool> CreateCourse(CourseCreateInput courseCreateInput)
