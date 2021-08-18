@@ -15,7 +15,7 @@ namespace Course.Web.Models.Baskets
 
         public decimal Price { get; set; }
 
-        public decimal? DiscountAppliedPrice { get; set; }
+        public decimal? DiscountAppliedPrice;
 
         public decimal CurrentPrice => DiscountAppliedPrice ?? Price;
 

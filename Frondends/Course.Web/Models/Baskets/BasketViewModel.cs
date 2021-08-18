@@ -7,13 +7,18 @@ namespace Course.Web.Models.Baskets
 {
     public class BasketViewModel
     {
+        public BasketViewModel()
+        {
+            _basketItems = new List<BasketItemViewModel>();
+        }
+
         public string UserId { get; set; }
 
         public string DiscountCode { get; set; }
 
         public int? DiscountRate { get; set; }
 
-        private List<BasketItemViewModel> _basketItems { get; set; }
+        private List<BasketItemViewModel> _basketItems;
 
         public List<BasketItemViewModel> BasketItems
         {
@@ -33,8 +38,20 @@ namespace Course.Web.Models.Baskets
             set => _basketItems = value;
         }
 
-        public bool HasDiscount => !string.IsNullOrEmpty(DiscountCode);
+        public bool HasDiscount => !string.IsNullOrEmpty(DiscountCode) && DiscountRate.HasValue;
 
         public decimal TotalPrice => _basketItems.Sum(item => item.Price * item.Quantity);
+
+        public void CancelDiscount()
+        {
+            DiscountRate = null;
+            DiscountCode = null;
+        }
+
+        public void ApplyDiscount(string code, int rate)
+        {
+            DiscountCode = code;
+            DiscountRate = rate;
+        }
     }
 }

@@ -13,10 +13,12 @@ namespace Course.Web.Services.Concrete
     public class BasketService : IBasketService
     {
         private readonly HttpClient _httpClient;
+        private readonly IDiscountService _discountService;
 
-        public BasketService(HttpClient httpClient)
+        public BasketService(HttpClient httpClient, IDiscountService discountService)
         {
             _httpClient = httpClient;
+            _discountService = discountService;
         }
 
 
@@ -94,14 +96,41 @@ namespace Course.Web.Services.Concrete
             return await SaveOrUpdate(basket);
         }
 
-        public Task<bool> ApplyDiscount(string discountCode)
+        public async Task<bool> ApplyDiscount(string discountCode)
         {
-            throw new NotImplementedException();
+            await CancelAppliedDiscount();
+
+            var basket = await Get();
+
+            if (basket == null)
+            {
+                return false;
+            }
+
+            var discount = await _discountService.GetDiscount(discountCode);
+
+            if (discount == null)
+            {
+                return false;
+            }
+
+            basket.ApplyDiscount(discount.Code, discount.Rate);
+
+            return await SaveOrUpdate(basket);
         }
 
-        public Task<bool> CancelApplyDiscount()
+        public async Task<bool> CancelAppliedDiscount()
         {
-            throw new NotImplementedException();
+            var basket = await Get();
+
+            if (basket?.DiscountCode == null)
+            {
+                return false;
+            }
+            
+            basket.CancelDiscount();
+
+            return await SaveOrUpdate(basket);
         }
     }
 }

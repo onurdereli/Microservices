@@ -1,6 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System;
+using System.Linq;
+using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 using Course.Web.Models.Baskets;
+using Course.Web.Models.Discount;
 using Course.Web.Services.Abstract;
 using Microsoft.AspNetCore.Authorization;
 
@@ -43,6 +46,29 @@ namespace Course.Web.Controllers
         public async Task<IActionResult> DeleteBasketItem(string courseId)
         {
             await _basketService.RemoveBasketItem(courseId);
+
+            return RedirectToAction(nameof(Index));
+        }
+
+        public async Task<IActionResult> ApplyDiscount(DiscountApplyInput discountApplyInput)
+        {
+            // İndex'e yönlendirme olduğu için hata es geçiliyor bunun için tempdatada tutularak ekrana yansıtılır
+            if(!ModelState.IsValid)
+            {
+                TempData["discountError"] = string.Join(" | ", ModelState.Values.SelectMany(value => value.Errors).Select(error => error.ErrorMessage));
+            }else
+            {
+                var discountStatus = await _basketService.ApplyDiscount(discountApplyInput.Code);
+
+                TempData["discountStatus"] = discountStatus;
+            }
+
+            return RedirectToAction(nameof(Index));
+        }
+
+        public async Task<IActionResult> CancelAppliedDiscount()
+        {
+            await _basketService.CancelAppliedDiscount();
 
             return RedirectToAction(nameof(Index));
         }

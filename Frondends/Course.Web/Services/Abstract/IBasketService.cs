@@ -17,6 +17,6 @@ namespace Course.Web.Services.Abstract
 
         Task<bool> ApplyDiscount(string discountCode);
 
-        Task<bool> CancelApplyDiscount();
+        Task<bool> CancelAppliedDiscount();
     }
 }
