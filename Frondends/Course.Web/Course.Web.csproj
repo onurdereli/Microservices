@@ -15,4 +15,8 @@
     <ProjectReference Include="..\..\Shared\Course.Shared\Course.Shared.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Models\Discount\" />
+  </ItemGroup>
+
 </Project>

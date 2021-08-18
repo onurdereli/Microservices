@@ -10,7 +10,7 @@ using Course.Web.Extensions;
 using Course.Web.Handler;
 using Course.Web.Helpers;
 using Course.Web.Models;
-using Course.Web.Models.Catalog;
+using Course.Web.Models.Catalogs;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.Cookies;
 

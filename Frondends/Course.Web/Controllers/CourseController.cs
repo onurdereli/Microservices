@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Course.Shared.Services.Abstract;
-using Course.Web.Models.Catalog;
+using Course.Web.Models.Catalogs;
 using Course.Web.Services.Abstract;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Rendering;

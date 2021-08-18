@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Course.Web.Models.Catalog;
+using Course.Web.Models.Catalogs;
 
 namespace Course.Web.Services.Abstract
 {

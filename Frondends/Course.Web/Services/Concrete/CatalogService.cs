@@ -5,7 +5,7 @@ using System.Reflection.PortableExecutable;
 using System.Threading.Tasks;
 using Course.Shared.Dtos;
 using Course.Web.Helpers;
-using Course.Web.Models.Catalog;
+using Course.Web.Models.Catalogs;
 using Course.Web.Services.Abstract;
 
 namespace Course.Web.Services.Concrete

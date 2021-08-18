@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
-using Course.Web.Models.Catalog;
+using Course.Web.Models.Catalogs;
 using FluentValidation;
 
 namespace Course.Web.Validators
