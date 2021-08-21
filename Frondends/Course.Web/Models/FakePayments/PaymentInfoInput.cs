@@ -15,6 +15,6 @@ namespace Course.Web.Models.FakePayments
 
         public string Cvv { get; set; }
 
-        public string TotalPrice { get; set; }
+        public decimal TotalPrice { get; set; }
     }
 }

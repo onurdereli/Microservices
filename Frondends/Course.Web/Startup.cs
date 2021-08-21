@@ -38,7 +38,6 @@ namespace Course.Web
             services.AddScoped<ResourceOwnerPasswordTokenHandler>();
             services.AddScoped<ClientCredentialTokenHandler>();
             services.AddScoped<ISharedIdentityService, SharedIdentityService>();
-            services.AddScoped<ISharedIdentityService, SharedIdentityService>();
 
             services.AddSingleton<PhotoHelper>();
 

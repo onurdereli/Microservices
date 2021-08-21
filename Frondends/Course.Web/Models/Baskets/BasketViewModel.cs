@@ -40,7 +40,7 @@ namespace Course.Web.Models.Baskets
 
         public bool HasDiscount => !string.IsNullOrEmpty(DiscountCode) && DiscountRate.HasValue;
 
-        public decimal TotalPrice => _basketItems.Sum(item => item.Price * item.Quantity);
+        public decimal TotalPrice => _basketItems.Sum(item => item.CurrentPrice * item.Quantity);
 
         public void CancelDiscount()
         {
