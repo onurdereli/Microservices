@@ -5,6 +5,8 @@ using Course.Services.FakePayment.Models;
 using Course.Shared.ControllerBase;
 using Course.Shared.Dtos;
 using Course.Shared.Messages;
+using Course.Shared.Messages.Commands;
+using Course.Shared.Messages.Commands.Concreate;
 using MassTransit;
 using Microsoft.AspNetCore.Mvc;
 

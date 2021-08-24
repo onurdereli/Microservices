@@ -1,10 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
+using Course.Shared.Messages.Commands.Abstract;
 
-namespace Course.Shared.Messages
+namespace Course.Shared.Messages.Commands.Concreate
 {
-    public class CreateOrderMessageCommand
+    public class CreateOrderMessageCommand: ICreateOrderMessageCommand
     {
         public CreateOrderMessageCommand()
         {

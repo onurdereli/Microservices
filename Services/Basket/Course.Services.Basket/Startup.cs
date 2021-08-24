@@ -1,21 +1,17 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
-using System;
-using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
-using System.Threading.Tasks;
+using Course.Services.Basket.Consumers;
 using Course.Services.Basket.Services.Abstract;
 using Course.Services.Basket.Services.Concrete;
 using Course.Services.Basket.Settings;
 using Course.Shared.Services.Abstract;
 using Course.Shared.Services.Concrete;
+using MassTransit;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Authorization;
@@ -35,6 +31,31 @@ namespace Course.Services.Basket
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+
+            services.AddMassTransit(x =>
+            {
+                //yeni consumer eklendiğinde eklenmeli
+                x.AddConsumer<BasketCourseNameChangedEventConsumer>();
+
+                // Default Port : 5672
+                x.UsingRabbitMq((context, cfg) =>
+                {
+                    cfg.Host(Configuration["RabbitMQUrl"], "/", host =>
+                    {
+                        host.Username("guest");
+                        host.Password("guest");
+                    });
+
+                    cfg.ReceiveEndpoint("course-name-changed-event-basket-service", e =>
+                    {
+                        e.ConfigureConsumer<BasketCourseNameChangedEventConsumer>(context);
+                    });
+
+                });
+            });
+
+            services.AddMassTransitHostedService();
+
             // giriş yapmış bir kullanıcı beklediğini belirtir
             var requireAutorizePolicy = new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build();
             JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Remove("sub");
@@ -63,6 +84,7 @@ namespace Course.Services.Basket
             {
                 options.Filters.Add(new AuthorizeFilter(requireAutorizePolicy));
             });
+            
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Course.Services.Basket", Version = "v1" });

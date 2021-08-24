@@ -1,15 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Course.Services.Order.Instrastructure;
-using Course.Shared.Messages;
+using Course.Shared.Messages.Commands.Abstract;
 using MassTransit;
 
 namespace Course.Services.Order.Application.Consumers
 {
-    public class CreateOrderMessageCommandConsumer:IConsumer<CreateOrderMessageCommand>
+    public class CreateOrderMessageCommandConsumer:IConsumer<ICreateOrderMessageCommand>
     {
         private readonly OrderDbContext _orderDbContext;
 
@@ -18,7 +14,7 @@ namespace Course.Services.Order.Application.Consumers
             _orderDbContext = orderDbContext;
         }
 
-        public async Task Consume(ConsumeContext<CreateOrderMessageCommand> context)
+        public async Task Consume(ConsumeContext<ICreateOrderMessageCommand> context)
         {
             var newAdress = new Domain.OrderAggregate.Address(context.Message.Address.Province, context.Message.Address.District, context.Message.Address.Street, context.Message.Address.ZipCode, context.Message.Address.Line);
             
