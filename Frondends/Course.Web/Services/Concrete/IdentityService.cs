@@ -138,7 +138,6 @@ namespace Course.Web.Services.Concrete
                 new AuthenticationToken{ Name=OpenIdConnectParameterNames.RefreshToken,Value=token.RefreshToken},
                 new AuthenticationToken{ Name=OpenIdConnectParameterNames.ExpiresIn,Value= DateTime.Now.AddSeconds(token.ExpiresIn).ToString("o",CultureInfo.InvariantCulture)}
             };
-            ;
 
             var authenticateResult = await _httpContextAccessor.HttpContext.AuthenticateAsync();
 

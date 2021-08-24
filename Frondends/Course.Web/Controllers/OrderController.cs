@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System;
+using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 using Course.Web.Models.Orders;
 using Course.Web.Services.Abstract;
@@ -30,25 +31,48 @@ namespace Course.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> Checkout(CheckoutInfoInput checkoutInfoInput)
         {
-            var createdOrder = await _orderService.CreateOrder(checkoutInfoInput);
+            #region 1. yol senkron iletişim
 
-            if (!createdOrder.IsSuccessfull)
+            /*
+             var orderStatus = await _orderService.CreateOrder(checkoutInfoInput);
+            if (!orderStatus.IsSuccessfull)
             {
                 var basketViewModel = await _basketService.Get();
 
                 ViewBag.basket = basketViewModel;
-                ViewBag.error = createdOrder.Error;
+                ViewBag.error = orderStatus.Error;
 
                 return View();
             }
+            return RedirectToAction(nameof(SuccessfullCheckout), new { orderId = orderStatus.OrderId });
+             */
 
-            return RedirectToAction(nameof(SuccessfullCheckout), new { orderId = createdOrder.OrderId });
+            #endregion
+
+            //2. yol asenkron iletişim
+            var orderSuspend = await _orderService.SuspendOrder(checkoutInfoInput);
+            if (!orderSuspend.IsSuccessfull)
+            {
+                var basketViewModel = await _basketService.Get();
+
+                ViewBag.basket = basketViewModel;
+                ViewBag.error = orderSuspend.Error;
+
+                return View();
+            }
+            //Senkron iletişimde id dönülmediği için hatayı engellemek için random bi değer atandı
+            return RedirectToAction(nameof(SuccessfullCheckout), new { orderId = new Random().Next(1, 1000) });
         }
 
         public IActionResult SuccessfullCheckout(int orderId)
         {
             ViewBag.orderId = orderId;
             return View();
+        }
+        
+        public async Task<IActionResult> CheckoutHistory()
+        {
+            return View(await _orderService.GetOrder());
         }
     }
 }

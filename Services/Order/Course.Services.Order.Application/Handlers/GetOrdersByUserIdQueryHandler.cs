@@ -1,9 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Course.Services.Order.Application.Configuration.Mappings;
 using Course.Services.Order.Application.Dtos;
-using Course.Services.Order.Application.Mapping;
 using Course.Services.Order.Application.Queries;
 using Course.Services.Order.Instrastructure;
 using Course.Shared.Dtos;
@@ -12,7 +13,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Course.Services.Order.Application.Handlers
 {
-    public class GetOrdersByUserIdQueryHandler: IRequestHandler<GetOrdersByUserIdQuery, Response<List<OrderDto>>>
+    public class GetOrdersByUserIdQueryHandler : IRequestHandler<GetOrdersByUserIdQuery, Response<List<OrderDto>>>
     {
         private readonly OrderDbContext _context;
 
@@ -23,17 +24,16 @@ namespace Course.Services.Order.Application.Handlers
 
         public async Task<Response<List<OrderDto>>> Handle(GetOrdersByUserIdQuery request, CancellationToken cancellationToken)
         {
-            var orders = await _context.Orders
-                .Include(order => order.OrderItems)
-                .Where(order => order.BuyerId == request.UserId).ToListAsync(cancellationToken: cancellationToken);
+            var orders = await _context.Orders.Include(x => x.OrderItems).Where(x => x.BuyerId == request.UserId).ToListAsync();
+
             if (!orders.Any())
             {
                 return Response<List<OrderDto>>.Success(new List<OrderDto>(), 200);
             }
 
-            var orderDtos = ObjectMapping.Mapper.Map<List<OrderDto>>(orders);
+            var ordersDto = ObjectMapper.Mapper.Map<List<OrderDto>>(orders);
 
-            return Response<List<OrderDto>>.Success(orderDtos, 200);
+            return Response<List<OrderDto>>.Success(ordersDto, 200);
         }
     }
 }

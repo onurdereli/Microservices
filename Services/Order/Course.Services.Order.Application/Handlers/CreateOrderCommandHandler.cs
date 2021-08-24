@@ -1,6 +1,7 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 using Course.Services.Order.Application.Commands;
+using Course.Services.Order.Application.Configuration.Mappings;
 using Course.Services.Order.Application.Dtos;
 using Course.Services.Order.Domain.OrderAggregate;
 using Course.Services.Order.Instrastructure;
@@ -20,7 +21,7 @@ namespace Course.Services.Order.Application.Handlers
 
         public async Task<Response<CreatedOrderDto>> Handle(CreateOrderCommand request, CancellationToken cancellationToken)
         {
-            var newAddress = Mapping.ObjectMapping.Mapper.Map<Address>(request.Address);
+            var newAddress = ObjectMapper.Mapper.Map<Address>(request.Address);
             Domain.OrderAggregate.Order newOrder = new(request.BuyerId, newAddress);
 
             request.OrderItems.ForEach(orderItem =>

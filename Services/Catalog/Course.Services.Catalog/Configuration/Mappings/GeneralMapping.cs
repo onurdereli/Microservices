@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using AutoMapper;
+﻿using AutoMapper;
 using Course.Services.Catalog.Dtos;
 using Course.Services.Catalog.Model;
 
-namespace Course.Services.Catalog.Mapping
+namespace Course.Services.Catalog.Configuration.Mappings
 {
     public class GeneralMapping: Profile
     {

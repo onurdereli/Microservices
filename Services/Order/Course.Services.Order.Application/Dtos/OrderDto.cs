@@ -14,5 +14,10 @@ namespace Course.Services.Order.Application.Dtos
         public string BuyerId { get; set; }
 
         public List<OrderItemDto> OrderItems { get; set; }
+
+        public OrderDto()
+        {
+            OrderItems = new List<OrderItemDto>();
+        }
     }
 }

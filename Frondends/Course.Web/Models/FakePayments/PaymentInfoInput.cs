@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Course.Web.Models.Orders;
 
 namespace Course.Web.Models.FakePayments
 {
@@ -16,5 +13,7 @@ namespace Course.Web.Models.FakePayments
         public string Cvv { get; set; }
 
         public decimal TotalPrice { get; set; }
+
+        public OrderCreateInput Order { get; set; }
     }
 }

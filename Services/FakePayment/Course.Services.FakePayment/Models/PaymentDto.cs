@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace Course.Services.FakePayment.Models
+﻿namespace Course.Services.FakePayment.Models
 {
     public class PaymentDto
     {
@@ -15,6 +10,8 @@ namespace Course.Services.FakePayment.Models
 
         public string Cvv { get; set; }
 
-        public string TotalPrice { get; set; }
+        public decimal TotalPrice { get; set; }
+
+        public OrderDto Order { get; set; }
     }
 }
