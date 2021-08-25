@@ -1,3 +1,5 @@
+using Course.Gateway.DelegateHandlers;
+using IdentityModel.Client;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
@@ -27,8 +29,8 @@ namespace Course.Gateway
                 options.Audience = "resource_gateway";
                 options.RequireHttpsMetadata = false;
             });
-
-            services.AddOcelot();
+            services.AddHttpClient<TokenExhangeDelegateHandler>();
+            services.AddOcelot().AddDelegatingHandler<TokenExhangeDelegateHandler>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

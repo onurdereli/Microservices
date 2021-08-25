@@ -77,10 +77,8 @@ namespace Course.IdentityServer
                     // OpenId mutlaka olmalı - Scopelar servislerin token ile erişebileceği bilgileri tutar
                     // IdentityServer'a istek yapabilmek için "IdentityServerConstants.LocalApi.ScopeName" ekli olmalı
                     AllowedScopes = {
-                        "discount_fullpermission",
                         "basket_fullpermission",
                         "order_fullpermission",
-                        "payment_fullpermission",
                         "gateway_fullpermission",
                         IdentityServerConstants.LocalApi.ScopeName,
                         IdentityServerConstants.StandardScopes.Email,
@@ -94,7 +92,16 @@ namespace Course.IdentityServer
                     AbsoluteRefreshTokenLifetime = (int)(DateTime.Now.AddDays(60)-DateTime.Now).TotalSeconds,
                     RefreshTokenUsage = TokenUsage.ReUse 
                     // Mantığı; 60 gün boyunca siteye 1 kez bile girilmezse login ekranına geri döndürür
-                }
+                },
+                // Token Exchange Client ile WebMvcClientForUser'e sahip tokenı olan kullanıcılar erişim sağlayabilecekler
+                new Client
+                {
+                    ClientName="Token Exchange Client",
+                    ClientId="TokenExhangeClient",
+                    ClientSecrets= {new Secret("secret".Sha256())},
+                    AllowedGrantTypes= new []{ "urn:ietf:params:oauth:grant-type:token-exchange" },
+                    AllowedScopes={ "discount_fullpermission", "payment_fullpermission", IdentityServerConstants.StandardScopes.OpenId }
+                },
             };
     }
 }
