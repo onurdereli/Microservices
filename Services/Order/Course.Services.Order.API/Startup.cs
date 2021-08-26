@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using System.IdentityModel.Tokens.Jwt;
+using Course.Services.Order.API.Migrations;
 using Course.Services.Order.Application.Consumers;
 using Course.Services.Order.Instrastructure;
 using Course.Shared.Services.Abstract;
@@ -78,6 +79,7 @@ namespace Course.Services.Order.API
                     configure.MigrationsAssembly("Course.Services.Order.Instrastructure");
                 });
             });
+            services.AddTransient<IStartupFilter, MigrationStartupFilter<OrderDbContext>>();
             services.AddScoped<ISharedIdentityService, SharedIdentityService>();
             services.AddMediatR(typeof(Application.Handlers.CreateOrderCommandHandler).Assembly);
 
