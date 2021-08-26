@@ -1,0 +1,111 @@
+version: "3.8"
+services:
+  catalogdb:
+    container_name: catalogdb
+    restart: always
+    # always herhangi bir restart olma durumunda container'ı ayağa kaldırır
+    ports: 
+      - "27017:27017"
+    volumes: 
+      - catalogdb_volume:/data/db
+      # catalogdb_volume'ü catalogdb'ye maplenmesini sağlar
+  basketdb:
+    container_name: basketdb
+    restart: always
+    # always herhangi bir restart olma durumunda container'ı ayağa kaldırır
+    ports: 
+      - "6379:6379"
+    # redis memoryde tutulduğu için volumes'de tutulmaz
+  discountdb:
+    container_name: discountdb
+    restart: always
+    # always herhangi bir restart olma durumunda container'ı ayağa kaldırır
+    ports: 
+      - "5432:5432"
+    volumes: 
+      - discountdb_volume:/var/lib/postgresql/data
+    environment: 
+      - POSTGRES_USER=sa
+      - POSTGRES_PASSWORD=Password12.
+      - POSTGRES_DB=discountdb
+    # postgresql için db özelliklerini environment'a alır
+  identitydb:
+    container_name: identitydb
+    restart: always
+    # always herhangi bir restart olma durumunda container'ı ayağa kaldırır
+    ports: 
+      - "1433:1433"
+    volumes: 
+      - identitydb_volume:/var/opt/mssql
+    environment: 
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=Password12.
+    # mssql için db özelliklerini environment'a alır
+  orderdb:
+    container_name: orderdb
+    restart: always
+    # always herhangi bir restart olma durumunda container'ı ayağa kaldırır
+    ports: 
+      - "1444:1433"
+    volumes: 
+      - orderdb_volume:/var/opt/mssql
+    environment: 
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=Password12.
+    # mssql için db özelliklerini environment'a alır
+  rabbitmq:
+    container_name: rabbitmq
+    restart: always
+    # always herhangi bir restart olma durumunda container'ı ayağa kaldırır
+    ports: 
+      - "5672:5672"
+      - "15672:15672"
+  catalog.api:
+    container_name: catalog.api
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - RabbitMQUrl=rabbitmq
+      - IdentityServerURL=http://identityserver.api
+      - DatabaseSettings:ConnectionString=mongodb://catalogdb:27017
+    ports: 
+      - "5011:80" # catalog 5011 portundan ayağa kalıyor 80 port olarak da dockera bağlanıyor
+    depends_on:
+      - catalogdb # ayağa kalkarken catalogdb containerin ayakta olmasını belirtiyor
+  identityserver.api:
+    container_name: identityserver.api
+    restart: on-failure
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - "ConnectionStrings:DefaultConnection=Server=identitydb,1433;Database=IdentityDb; User=sa; Password=Password12."
+    ports:
+      - "5001:80"
+    depends_on:
+      - identitydb
+  basket.api:
+    container_name: basket.api
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - RabbitMQUrl=rabbitmq
+      - IdentityServerURL=http://identityserver.api:5001
+      - RedisSettings:Host=basketdb
+      - RedisSettings:Port=6379
+    ports: 
+      - "5013:80" # basket 5013 portundan ayağa kalıyor 80 port olarak da dockera bağlanıyor
+    depends_on:
+      - basketdb # ayağa kalkarken basketdb containerin ayakta olmasını belirtiyor
+  photostock.api:
+    container_name: photostock.api
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - RabbitMQUrl=rabbitmq
+      - IdentityServerURL=http://identityserver.api:5001
+    ports: 
+      - "5012:80" # photostock 5012 portundan ayağa kalıyor 80 port olarak da dockera bağlanıyor
+    volumes: 
+      - type: bind
+        source: C:\Users\MSU\Desktop\Siteler\Microservices\photos
+        target: /app/wwwroot/photos
+
+#docker-compose up komutu dockerları ayağa kaldırır
+#ctrl c ile up olduktan sonra tıklanırsa stop'a çeker
+#docker-compose down komutu dockerları siler
