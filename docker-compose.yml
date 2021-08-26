@@ -37,6 +37,36 @@ services:
       context: .
       # mevcut pathi referans alır
       dockerfile: Services/PhotoStock/Course.Services.PhotoStock/Dockerfile
+  discount.api:
+    image: discount_api_image
+    build: 
+      context: .
+      # mevcut pathi referans alır
+      dockerfile: Services/Discount/Course.Services.Discount/Dockerfile
+  fakepayment.api:
+    image: fakepayment_api_image
+    build: 
+      context: .
+      # mevcut pathi referans alır
+      dockerfile: Services/FakePayment/Course.Services.FakePayment/Dockerfile
+  order.api:
+    image: order_api_image
+    build: 
+      context: .
+      # mevcut pathi referans alır
+      dockerfile: Services/Order/Course.Services.Order.API/Dockerfile
+  gateway.api:
+    image: gateway_api_image
+    build: 
+      context: .
+      # mevcut pathi referans alır
+      dockerfile: Gateway/Course.Gateway/Dockerfile
+  aspnetcoremvc.web:
+    image: aspnetcoremvc.web_image
+    build: 
+      context: .
+      # mevcut pathi referans alır
+      dockerfile: Frondends/Course.Web/Dockerfile
 volumes:
   catalogdb_volume:
   discountdb_volume:
